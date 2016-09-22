@@ -232,10 +232,11 @@ EJ_BIND_GET(authed, ctx) {
 
 
 #define InvokeAndUnprotectCallback(callback, error, object) \
+	JSContextRef gctx = scriptView.jsGlobalContext; \
 	[scriptView invokeCallback:callback thisObject:NULL argc:2 argv: \
 		(JSValueRef[]){ \
-			JSValueMakeBoolean(scriptView.jsGlobalContext, error), \
-			(object ? NSObjectToJSValue(scriptView.jsGlobalContext, object) : scriptView->jsUndefined) \
+			error ? NSStringToJSValue(gctx, error.localizedDescription) : JSValueMakeBoolean(gctx, false), \
+			(object ? NSObjectToJSValue(gctx, object) : scriptView->jsUndefined) \
 		} \
 	]; \
 	JSValueUnprotect(scriptView.jsGlobalContext, callback);
